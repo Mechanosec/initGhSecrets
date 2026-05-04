@@ -76,14 +76,15 @@ def main() -> None:
 
     print(f"Adding new secrets from {secrets_path}:")
     for entry in secrets:
-        name = entry.get("name")
-        value = entry.get("value")
-        if name is None or value is None:
+        name = (entry.get("name") or "").strip()
+        value = str(entry.get("value", "")).strip()
+        if not name or entry.get("value") is None:
             print(f"  Skipping invalid entry: {entry}", file=sys.stderr)
             continue
         print(f"→ Setting secret: {name}")
         run(
-            ["gh", "secret", "set", name, "--repo", repo, "--env", env, "-b", value],
+            ["gh", "secret", "set", name, "--repo", repo, "--env", env],
+            input=value,
             capture_output=True,
         )
 
